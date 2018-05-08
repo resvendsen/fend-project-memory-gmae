@@ -1,0 +1,200 @@
+html {
+    box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+}
+
+h6 {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #fff url(../img/geometry2.png); /* Background pattern from Subtle Patterns */
+    font-family: "Coda", cursive;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+h1 {
+    font-family: "Open Sans", sans-serif;
+    font-weight: 300;
+}
+
+/*
+ * Styles for the deck of cards
+ */
+
+.deck {
+    width: 660px;
+    min-height: 680px;
+    background: linear-gradient(160deg, #02ccba 0%, #aa7ecd 100%);
+    padding: 32px;
+    border-radius: 10px;
+    box-shadow: 12px 15px 20px 0 rgba(46, 61, 73, 0.5);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 3em;
+}
+
+.deck .card {
+    height: 125px;
+    width: 125px;
+    background: #2e3d49;
+    font-size: 0;
+    color: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 5px 2px 20px 0 rgba(46, 61, 73, 0.5);
+}
+
+.deck .card.open {
+    background: #02b3e4;
+    cursor: default;
+}
+
+.deck .card.show {
+    font-size: 33px;
+}
+
+.deck .card.match {
+    cursor: default;
+    background: #02ccba;
+    font-size: 33px;
+}
+
+/*
+ * Styles for card flip animation
+ */
+
+.deck {
+    -webkit-perspective: 800px;
+            perspective: 800px;
+}
+
+.deck .card.open {
+    -webkit-transform: translate(-100%) rotateY(-180deg);
+            transform: translate(-100%) rotateY(-180deg);
+}
+
+.card {
+    transition: -webkit-transform 0.6s;
+    transition: transform 0.6s;
+    transition: transform 0.6s, -webkit-transform 0.6s;
+    -webkit-transform-style: preserve-3d;
+            transform-style: preserve-3d;
+    -webkit-transform-origin: right center;
+            transform-origin: right center;
+}
+
+.card i {
+    -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+    position: absolute;
+}
+
+.card i.front {
+    left: 60%;
+}
+
+/* front pane - placed on top of back  */
+.card .front {
+    z-index: 2;
+    -webkit-transform: translate(-100%) rotateY(-180deg);
+            transform: translate(-100%) rotateY(-180deg);
+}
+
+/* back - initially */
+ .card .back {
+    -webkit-transform: rotateY(0);
+            transform: rotateY(0);
+}
+
+/* back on top of front */
+.card .back.show {
+    z-index: 5;
+    font-size: 33px;
+}
+
+/*
+ * Styles for the Score Panel
+ */
+
+.score-panel {
+    text-align: left;
+    width: 345px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+}
+
+.score-panel input {
+    width: 65px;
+    text-align: center;
+}
+
+.score-panel .start {
+    background-color: #f22;
+    color: #fff;
+}
+
+.score-panel .nameOk {
+    background-color: #000;
+    color: #fff;
+}
+
+/* this is for the input element's placeholder text styling */
+:-ms-input-placeholder {
+    color: #ddd;
+    font-style: italic;
+}
+::-webkit-input-placeholder {
+    color: #ddd;
+    font-style: italic;
+}
+::-ms-input-placeholder {
+    color: #ddd;
+    font-style: italic;
+}
+::placeholder {
+    color: #ddd;
+    font-style: italic;
+}
+
+.score-panel .stars {
+    padding: 0;
+    display: inline-block;
+    margin: 0 5px 0 0;
+}
+
+.score-panel .stars li {
+    list-style: none;
+    display: inline-block;
+}
+
+.score-panel .restart {
+    cursor: pointer;
+}
