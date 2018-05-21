@@ -36,14 +36,125 @@ body {
 h1 {
     font-family: "Open Sans", sans-serif;
     font-weight: 300;
+    font-size: 10vw;
 }
+
+
+/*
+ * Styles for game results modal popup
+ */
+
+/* this is responsive as opposed to the js confirm which doesn't seem to be */
+/* from quora.com "How do I create a customized responsive confirm box without
+  using any libraries (i.e Bootstrap, jQuery)? Oct 2, 2017 Saptarshi Basu"  */
+.modal-main {
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  position: fixed;
+  background-color: #fefefe;
+  margin: auto;
+  border: 1px solid #888;
+  border-radius: 8px;
+  width: 28rem;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  -webkit-animation-name: animatetop;
+          animation-name: animatetop;
+  -webkit-animation-duration: 0.4s;
+          animation-duration: 0.4s;
+  z-index: 100;
+}
+
+.modal-header {
+  padding: 0.1rem 1rem;
+  background-color: #4ca1af;
+  color: #fff;
+}
+
+.modal-header h1 {
+  font-size: 1.5rem;
+}
+
+.modal-body {
+  padding: 1rem;
+  max-height: 100vh;
+  max-width: 100%;
+  overflow-y: auto;
+  background-color: #f3f3f4;
+  text-align: center;
+}
+
+.modal-body p {
+    white-space: pre-wrap;
+}
+
+.modal-body button {
+  width: 5rem;
+  background-color: #4ca1af;
+  color: #fff;
+  padding: 0.2rem;
+  margin: auto;
+  display: inline-block;
+  border-radius: 6px;
+}
+
+.modal-container {
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  visibility: hidden;
+}
+
+@-webkit-keyframes animatetop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes animatetop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .modal-main {
+    width:100%;
+  }
+}
+
+
+/*
+ * W3C logos
+ */
+
+img {
+    width: 100%;
+    height: auto;
+}
+
+footer p {
+    display: inline-flex;
+}
+
 
 /*
  * Styles for the deck of cards
  */
 
 .deck {
-    width: 660px;
+    max-width: 660px;
     min-height: 680px;
     background: linear-gradient(160deg, #02ccba 0%, #aa7ecd 100%);
     padding: 32px;
@@ -85,6 +196,7 @@ h1 {
     font-size: 33px;
 }
 
+
 /*
  * Styles for card flip animation
  */
@@ -107,12 +219,15 @@ h1 {
             transform-style: preserve-3d;
     -webkit-transform-origin: right center;
             transform-origin: right center;
+    position: relative;
 }
 
 .card i {
     -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
     position: absolute;
+    top: 40%;
+    left: 40%;
 }
 
 .card i.front {
@@ -138,21 +253,25 @@ h1 {
     font-size: 33px;
 }
 
+
 /*
  * Styles for the Score Panel
  */
 
 .score-panel {
     text-align: left;
-    width: 345px;
+    width: 65vw;
+    max-width: 640px;
     margin-bottom: 10px;
     display: flex;
     flex-wrap: nowrap;
     justify-content: space-between;
+    font-size: 3vw;
 }
 
 .score-panel input {
-    width: 65px;
+    width: 10.5vw;
+    font-size: 1.8vw;
     text-align: center;
 }
 
@@ -169,18 +288,22 @@ h1 {
 /* this is for the input element's placeholder text styling */
 :-ms-input-placeholder {
     color: #ddd;
+    font-size: 1.8vw;
     font-style: italic;
 }
 ::-webkit-input-placeholder {
     color: #ddd;
+    font-size: 1.8vw;
     font-style: italic;
 }
 ::-ms-input-placeholder {
     color: #ddd;
+    font-size: 1.8vw;
     font-style: italic;
 }
 ::placeholder {
     color: #ddd;
+    font-size: 1.8vw;
     font-style: italic;
 }
 
@@ -197,4 +320,53 @@ h1 {
 
 .score-panel .restart {
     cursor: pointer;
+}
+
+
+/*
+ * Media styles
+ */
+
+@media only screen and (max-width: 659px) {
+
+    .deck {
+        width: 100%;
+        min-height: 107vmin;
+        padding: 5vw;
+    }
+
+    .deck .card {
+        width: 19vw;
+        height: 19vw;
+    }
+
+    .card i {
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        top: 40%;
+        left: 2%;
+    }
+
+    .card i.front {
+        left: -3%;
+    }
+
+    .card .front {
+        -webkit-transform: rotateY(180deg);
+                transform: rotateY(180deg);
+    }
+
+    .deck .card.show {
+        font-size: 5vw;
+    }
+
+    .deck .card.match {
+        font-size: 5vw;
+    }
+
+    .card .back.show {
+        font-size: 5vw;
+    }
+
 }

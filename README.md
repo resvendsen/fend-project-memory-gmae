@@ -5,13 +5,14 @@
 * [Prerequisites](#prerequisites)
 * [Installation](#installation)
 * [Instructions](#instructions)
+* [Dependencies](#dependencies)
 * [Contributing](#contributing)
 * [Author](#author)
 
 ## Prerequisites
 
 Use a tested browser: Chrome or Safari.
-Since the CSS was scanned by Autoprefixer, it should also work on other browsers.
+Since the CSS was scanned by Autoprefixer, it should also work on other browsers, however.
 When using Safari, select this from the menu:  Develop > Disable Local File Restrictions.
 This needs to be set in order to maintain user data.
 I have yet to find a way to enable local file usage in Javascript.
@@ -39,6 +40,10 @@ If at any time you want to start over, click the restart button.  If you do, you
 When the you've completed a game, you'll have the options to cancel or restart (OK button).  Use restart when another person wants to play since it'll ask for his/her name.  Use cancel when you want to play again.  In this case, click on your game name and it'll reset with you playing another game.
 
 The star ratings are:  30 plays or less - 3 stars, 38 or less - 2 stars, 48 or less - 1 star.
+
+## Dependencies
+
+bootstrap font-awesome class scheme, googleapis font family Coda, vanilla JS & CSS, w3c html5 & css3 icons, Knuth shuffle algorithm (c.f., js/app.js for reference)
 
 ## Contributing
 

@@ -1,10 +1,13 @@
 /** TODO: store game state so it can be picked up later */
 /** TOTO: for Safari find a way to use local storage without setting the Develop menu item */
 /** TODO: keep time records for each player */
-/** TODO: work on better outcome for double clicking cards */
+/** TODO: work on better outcome for double clicking cards */  // DONE RES 5/15/18
+/** TODO: work on touch device logic, i.e., streamline it */
 
 // these three constants are the maximum values for one, two and three star ratings
-const oneStarLimit = 48;
+// RES 5/9/18 U reviewer noted that there should always be at least one filled in star
+//            So I'm removeing the one star limit
+/*  const oneStarLimit = 48;  */
 const twoStarLimit = 38;
 const threeStarLimit = 30;
 
@@ -147,6 +150,78 @@ function shuffle(array) {
 
 
 /**
+ * @function modalButtonHandler
+ * @desc process modal popup game summary buttons - same player, new player, done
+ * @param {event} e - event which caused this function to be invoked
+ * @returns nothing
+ */
+function modalButtonHandler(e) {
+    let button = e.target;
+    let buttons;
+    /* if click is not on a button, ignore it  */
+    if (button !== document.querySelector("button.same-player") &&
+        button !== document.querySelector("button.new-player") &&
+        button !== document.querySelector("button.game-over")) {return;}
+    switch (button.className) {
+        case "same-player":
+            // if user clicks cancel button, the game ends and allows player to click
+            // on his/her name to play again
+            codeNameEl.removeAttribute("disabled");
+            codeNameEl.setAttribute("autofocus", true);
+            buttons = document.querySelectorAll(".modal-body button");
+            for (let i=0; i<3; i++) {
+                buttons[i].disabled = true;
+            }
+            document.querySelector(".modal-container").style.visibility = "hidden";
+            if (!(document.querySelector("body.user-is-touching" === null))) {
+                restartEl.dispatchEvent(new MouseEvent("dblClick"));
+            }
+            break;
+        case "new-player":
+            // if user clicks ok button, the game restarts and requires player
+            // name to be entered
+            document.querySelector(".restart").click();
+            break;
+        case "game-over":
+            codeNameEl.removeAttribute("disabled");
+            buttons = document.querySelectorAll(".modal-body button");
+            for (let i=0; i<3; i++) {
+                buttons[i].disabled = true;
+            }
+            document.querySelector(".modal-container").style.visibility = "hidden";
+            break;
+        default:
+            throw ("Invalid value in modalButtonHandler");
+    }
+}
+
+/**
+ * @function popup
+ * @desc Displays the modal popup at the end of the game
+ *       This is a responsive popup as opposed to the js confirm function
+ * @param {String} msg - message to display
+ * @returns nothing
+ */
+/* from quora.com "How do I create a customized responsive confirm box without
+  using any libraries (i.e Bootstrap, jQuery)? Oct 2, 2017 Saptarshi Basu"  */
+function popUp(msg) {
+    /* start a click handler for the buttons */
+    let modalEl = document.querySelector(".modal-body");
+    modalEl.addEventListener("click", modalButtonHandler);
+    let buttons = modalEl.querySelectorAll("button");
+    for (let i=0; i<3; i++) {
+        buttons[i].disabled = false;
+    }
+    /* setup the message to be displayed  */
+    modalEl = document.querySelector(".modal-body p");
+    modalEl.innerHTML = msg;
+    /* make the modal popup visible */
+    modalEl = document.querySelector(".modal-container");
+    modalEl.style.visibility = "visible";
+}
+
+
+/**
  * @function increment
  * @desc Increments counter and, optionally, inserts HTML text with a label (title)
  * @param {object} countObj - object with attributes count and title
@@ -233,8 +308,9 @@ function updateStars() {
     const stars = document.querySelectorAll(".stars li i");
     for (let i=0; i < 3; i+=1) {
         switch (i) {
+            // changed so that one solid star always shows
             case 0:
-                stars[i].classList = "fa " + (plays.count <= oneStarLimit ? "fa-star" : "fa-star-o");
+                stars[i].classList = "fa fa-star";
                 break;
             case 1:
                 stars[i].classList = "fa " + (plays.count <= twoStarLimit ? "fa-star" : "fa-star-o");
@@ -258,7 +334,8 @@ function updateStars() {
  */
 function finalStars() {
     let s = "";
-    s += (plays.count <= oneStarLimit ? "\u2605" : "\u2606") + " ";
+    // changed so that one solid star always shows
+    s += "\u2605 ";
     s += (plays.count <= twoStarLimit ? "\u2605" : "\u2606") + " ";
     s += (plays.count <= threeStarLimit ? "\u2605" : "\u2606") + " ";
     return s;
@@ -282,24 +359,17 @@ function wrapUp() {
         // save best score to local storage using JSON so a string can be sent
         localStorage.setItem("playerBestScores", JSON.stringify(playerBestScores));
         let timeOfPlay = timer("interval");
-        // this timeout allows the game board display to complete before the modal popup
-        // is displayed, otherwise the gamebord display would wait until the modal
-        // popup is completed
-        setTimeout(function() {
-            if (confirm("Congratulations! You won!\n" +
+        if (!(document.querySelector("body.user-is-touching") === null)) {
+            popUp("Congratulations! You won!\n" +
                     "Time " + timeOfPlay.mins + "m " + timeOfPlay.secs + "s\n" +
                     finalStars() + "\n\n" +
-                    "Press OK for new player\nCancel for same player or done"
-                    )) {
-                // if user clicks ok button, the game restarts and requires player
-                // name to be entered
-                document.querySelector(".restart").click();
-            } else {
-                // if user clicks cancel button, the game ends and allows player to click
-                // on his/her name to play again
-                codeNameEl.removeAttribute("disabled");
-            }
-        }, 500);
+                    "To play again press New Game button\nOtherwise press Done");
+        } else {
+            popUp("Congratulations! You won!\n" +
+                    "Time " + timeOfPlay.mins + "m " + timeOfPlay.secs + "s\n" +
+                    finalStars() + "\n\n" +
+                    "To play again press a player button\nOtherwise press Done");
+        }
     }
 }
 
@@ -348,7 +418,6 @@ function namePresent() {
     nameSem.set();
     codeNameEl.setAttribute("readonly", "");
     codeNameEl.setAttribute("disabled", "");
-    codeNameEl.removeAttribute("autofocus");
     // starts the game timer
     timer("start");
 }
@@ -371,6 +440,9 @@ function restartHandler(e) {
     if (e.type === "click") {
         // remove session info if it's there
         sessionStorage.removeItem("codeName");
+        if (!(document.querySelector("body.user-is-touching") === null)) {
+            sessionStorage.setItem("user-is-touching", "user-is-touching");
+        }
         location.reload(true);
     } else
     // this occurs when the name text area is clicked
@@ -378,7 +450,11 @@ function restartHandler(e) {
     // so it prevents the user from incorrectly entering his name
     if (e.type === "dblClick") {
         // save this players session info in case he wants to play again
-        sessionStorage.setItem("codeName", codeName);
+        if (document.querySelector("body.user-is-touching") === null) {
+            sessionStorage.setItem("codeName", codeName);
+        } else {
+            sessionStorage.setItem("user-is-touching", "user-is-touching");
+        }
         location.reload();
     }
 }
@@ -456,25 +532,36 @@ function deckClickHandler(e) {
     // name must be entered before playing
     if (!nameSem.get()) {return;}
 
-    // this flips two non-matching cards before turning up the next card
-    if (clickSem.get()) {
-        clearTimeout(twoCardsVisibleTimer);
-        twoCardsVisibleTimer = null;
-        flip(openCards.pop());
-        flip(openCards.pop());
-        clickSem.reset();
-    }
     let card = e.target;
+    // don't care about a click on the deck itself (game board), want a click on a card
+    if (card === document.querySelector("ul.deck")) {return;}
+
+    // if click is on the image on back of card, make card the parent element (an li)
+    // li's have  a class of card
     if (card.tagName === "I") {
         card = card.parentNode;
     }
-    // don't flip card if it's already up
-    if (openCards.length !== 0 && card === openCards[openCards.length-1]) {return;}
+    // don't flip card if it's already face up
+    for (let i=0; i<openCards.length; i++) {
+        if (card === openCards[i]) {return;}
+    }
+/*    if (openCards.length !== 0 && card === openCards[openCards.length-1]) {return;}  */
+
+    // this flips two non-matching cards back to face down before next card turned up
+    // clickSem is only set when there are two non-matching cards face up
+    if (clickSem.get()) {
+        clearTimeout(twoCardsVisibleTimer);
+        clickSem.reset();
+        twoCardsVisibleTimer = null;
+        flip(openCards.pop());
+        flip(openCards.pop());
+    }
+
 
     let classes = card.classList;
-    increment(plays, playsEl);
     // card shouldn't already have been matched
     if (!classes.contains("match")) {
+        increment(plays, playsEl);
         flip(card);
         classes = card.classList;
         if (classes.contains("open") && classes.contains("show")) {
@@ -506,6 +593,44 @@ function deckClickHandler(e) {
     updateStars();
 }
 
+
+/* want to know if it's a touchscreen device */
+/* if game has already been played in this session shortcut the display process */
+let touchDev = sessionStorage.getItem("user-is-touching");
+if (touchDev) {
+    document.body.classList.add('user-is-touching');
+    codeName = "~Touch~";
+    codeNameEl.style.display = "none";
+    document.querySelector("button.new-player").style.display = "none";
+    document.querySelector("button.same-player").innerHTML = "New Game";
+} else {
+    /* from codeburst.io, "The only way to detect touch with Javascript", David Gilbertson, Aug 13, 2016 */
+    window.addEventListener('touchstart', function onFirstTouch() {
+        document.body.classList.add('user-is-touching');
+        codeName = "~Touch~";
+        codeNameEl.style.display = "none";
+        document.querySelector("button.new-player").style.display = "none";
+        document.querySelector("button.same-player").innerHTML = "New Game";
+        if (playerBestScores) {
+            if (playerBestScores.hasOwnProperty(codeName.toString())) {
+                bestScore = parseInt(playerBestScores[codeName.toString()]);
+            } else {
+                bestScore = 0;
+            }
+            codeNameEl.value = codeName;
+            bestScoreEl.innerHTML = "Best " + bestScore + "  ";
+            namePresent();
+        } else {     // in this case playerBestScores is null or empty
+            bestScore = 0;
+            codeNameEl.value = codeName;
+            bestScoreEl.innerHTML = "Best " + bestScore + "  ";
+            namePresent();
+        }
+        // we only need to know once that a human touched the screen, so we can stop listening now
+        window.removeEventListener('touchstart', onFirstTouch, false);
+    }, false);
+}
+
 restartEl.addEventListener("click", restartHandler);
 restartEl.addEventListener("dblClick", restartHandler);
 
@@ -514,7 +639,7 @@ playerBestScores = JSON.parse(localStorage.getItem("playerBestScores"));
 if (!playerBestScores) {playerBestScores = {};}
 
 // if session storage is present, use it to get player's info
-codeName = sessionStorage.getItem("codeName");
+if (!codeName) {codeName = sessionStorage.getItem("codeName");}
 if (!codeName) {
     codeName = "";
 } else {
